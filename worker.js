@@ -9,7 +9,7 @@
 			this._cb = cb;
 			this._job = job;
 			this._proc = this._exec(
-			'index.js',
+			'postgre_insert.js',
 			[],
 			{
 				cwd: '.',
@@ -22,7 +22,23 @@
 			}
 			);
 			attachProcessListeners.apply(this);
-			this._proc.send(job);
+			
+			job.pool.connect(function(err, client, done) {
+				if(err) {
+					return console.error('error fetching client from pool', err);
+				}
+				client.query('INSERT INTO sensor (name) values($1)', [job.id], function(err, result) {
+					//call `done()` to release the client back to the pool
+					done();
+
+				//	if(err) {
+				//		return console.error('error running query', err);
+				//	} 
+				});
+			});
+			this._proc.send(job.id);
+			
+			//this._proc.send(job);
 			
 			
 		};
@@ -35,10 +51,10 @@
 				//send response and maybe kill the child
 				this._proc.on('message', function(data){
 					that._cb(null, data);
-					that._proc.kill('SIGINT');
+					//that._proc.kill('SIGINT');
 				});
 				this._proc.on('error', function(err){
-					console.log("FUCK!!!!" + err)
+					console.log("Error occured!!!!" + err)
 				});
 			}
 	}
