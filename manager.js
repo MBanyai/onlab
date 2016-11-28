@@ -1,24 +1,27 @@
 (function (){
 	var Worker = require('./worker')();
 	var async = require('async');
+	var workers = new Array();
 	
 	module.exports = function(child){
 		function Manager(child){
-			this._q = async.queue(function(job, gueueRelease){
-				var worker = new Worker();
-				worker.execute(job, function(err, result){
+			for(var i=0; i< child; i++)
+				workers.push( new Worker());
+
+			this._q = async.queue(function(job, queueRelease){
+				var worker = workers.shift();
+				worker.process(job, function(err, result){
 					job.callback(result);
-					gueueRelease();
+					queueRelease();
 				});
+				workers.push(worker);
 			}, child);
 		}
 		Manager.prototype.process = function (job, callback){
-			job.callback=callback;
-			console.time(job.id);
+			job.callback = callback;
 			this._q.push(job, function(err){
-				console.timeEnd(job.id);
 			});
-		};
+		}
 		return new Manager(child);
 	};
 	
