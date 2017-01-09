@@ -48,12 +48,12 @@
 					job.avarage.push(row);
 				});
 				query.on('end',function(){	
-					sendReprocessed(job,cb);
+					send(job,cb);
 					});
 			});
 		};
 		
-		function sendReprocessed (job,cb){
+		function send(job,cb){
 			
 			job.repPool.connect(function(err, client, done) {
 				clearAvarage(err,client,done);

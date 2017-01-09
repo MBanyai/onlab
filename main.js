@@ -14,7 +14,8 @@
 	var totalRun = 0;
 	
 manager.reprocess(1,function(err,jobRes){	
-console.log(job.avarage);
+		console.log(job.avarage);
+
 });
 
 /*
@@ -38,12 +39,13 @@ setTimeout(call, 5000);
 			console.log(reqBody);
 			manager.process(reqBody, done);
 		});
-
+		response.status = 200;
 		response.end();
 	};
 
 
 	function done (err, jobResult){ //callback for the processing
+			if(job.success == true){
 				console.log('Worker response. I processed ' + (++totalRun)+ ' jobs');
 				console.log("The length: ",job.len);
 				console.log("The yunID: ",job.yun);
@@ -51,9 +53,12 @@ setTimeout(call, 5000);
 				console.log("The fields: ",job.fields);
 				console.log("The sensorID: ",job.sensor);
 				console.log("The pointer's end is: ",job.pointer);
-				console.log("Tht types: " + job.types[0].toString() +" " + job.types[1].toString());
+				console.log("The types: " + job.types[0].toString() +" " + job.types[1].toString());
 				console.log("The datas: " + job.datas[0].toString() + " "+ job.datas[1].toString());
 				console.log("Time: " + job.time.toString());
+			}
+			else
+				console.log("The recived data is not compatible with one of the four datatypes.");
 			};
 
 	http.createServer(handleRequest).listen(port);
