@@ -1,7 +1,8 @@
 'use strict';
 (function(){
-
-	var fs = require('fs'); //for debugging
+	// starting init process
+	var logger = require('./logger')("MainFunction");
+	logger.log("Starting initialization process.");
 	var async = require('async');
 	var uuid = require('node-uuid');
 	var _ = require('lodash');
@@ -13,10 +14,14 @@
 	var processRunning = 0;
 	var totalRun = 0;
 	
+
 manager.reprocess(1,function(err,jobRes){	
-		console.log(job.avarage);
+		logger.log(JSON.stringify(job.avarage).replace(/,/g,'\n'));
 
 });
+
+logger.log("Finishing initialization process.");
+
 
 /*
 setTimeout(call, 5000);
@@ -28,7 +33,6 @@ setTimeout(call, 5000);
 	}
 */	
 	function handleRequest(request,response){
-		console.log("===================================================");
 		var reqBody='';
 		request.on("data", function (data){
 			reqBody+=data;
@@ -36,7 +40,6 @@ setTimeout(call, 5000);
 				reqBody='';
 		});
 			request.on("end", function (data){
-			console.log(reqBody);
 			manager.process(reqBody, done);
 		});
 		response.status = 200;
@@ -46,19 +49,20 @@ setTimeout(call, 5000);
 
 	function done (err, jobResult){ //callback for the processing
 			if(job.success == true){
-				console.log('Worker response. I processed ' + (++totalRun)+ ' jobs');
-				console.log("The length: ",job.len);
-				console.log("The yunID: ",job.yun);
-				console.log("The slaveID: ",job.slave);
-				console.log("The fields: ",job.fields);
-				console.log("The sensorID: ",job.sensor);
-				console.log("The pointer's end is: ",job.pointer);
-				console.log("The types: " + job.types[0].toString() +" " + job.types[1].toString());
-				console.log("The datas: " + job.datas[0].toString() + " "+ job.datas[1].toString());
-				console.log("Time: " + job.time.toString());
+				logger.log("=====================================================");
+				logger.log('Worker response. I processed ' + (++totalRun)+ ' jobs');
+				logger.log("The length: "+jobResult.len);
+				logger.log("The yunID: "+jobResult.yun);
+				logger.log("The slaveID: "+jobResult.slave);
+				logger.log("The fields: "+jobResult.fields);
+				logger.log("The sensorID: "+jobResult.sensor);
+				logger.log("The pointer's end is: " + jobResult.pointer);
+				logger.log("The types: " + jobResult.types[0].toString() +" " + jobResult.types[1].toString());
+				logger.log("The datas: " + jobResult.datas[0].toString() + " "+ jobResult.datas[1].toString());
+				logger.log("Time: " + jobResult.time.toString());
 			}
 			else
-				console.log("The recived data is not compatible with one of the four datatypes.");
+				logger.log("The recived data is not compatible with one of the four datatypes.");
 			};
 
 	http.createServer(handleRequest).listen(port);

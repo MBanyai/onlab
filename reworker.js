@@ -2,9 +2,11 @@
 	'use strict';
 	var fs = require('fs'); //for debugging
 	
-	module.exports = function(){
-		function Reworker(){
+	module.exports = function(ID){
+		function Reworker(ID){
 			this._exec = require('child_process').fork;
+			this.ID = ID;
+			this.logger = require("./logger")('Reworker'+this.ID.toString());
 		};
 		
 		Reworker.prototype.process = function (job, cb){ 	//processes the given data
